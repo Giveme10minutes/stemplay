@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StemPlay · 六轨分轨播放器</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">StemPlay<span class="brand-sub">六轨分轨播放器</span></div>
+  <div class="transport">
+    <button id="playBtn" class="play-btn" disabled>加载中…</button>
+    <span id="timeLabel" class="time-label">0:00 / 0:00</span>
+  </div>
+</header>
+<main id="trackList" class="track-list"></main>
+<footer class="hint">点击或拖动波形可跳转 · M 静音本轨 · S 单独听本轨</footer>
+<script src="app.js"></script>
+</body>
+</html>
