@@ -20,30 +20,33 @@
 | 定位：预置 3-5 首精雕歌曲的"音乐体验玩具"（目标 A） | 已确认 |
 | 线上纯前端；Demucs 只是本地资产生产工具 | 已确认 |
 | 前端 React + TypeScript + shadcn/ui + Web Audio | 已确认 |
-| 四轨 vs 六轨：待试听定；前端按"每首歌元数据声明声部数"设计，兼容两者 | 待定 |
+| **六轨**（人声/鼓/贝斯/吉他/钢琴/其他）已定，前端与资产均已按六轨构建 | 已确认（2026-11-17） |
 | 律动视觉：AnalyserNode 实时频谱驱动，不用 MIDI | 已确认 |
+| 现有 `web/` 原生 JS 版 = 可视化测试原型，**由队友迁移到 React + shadcn** | 已确认（2026-11-17） |
 
-完整需求见 `需求文档.md`。
+完整需求见 `需求文档.md`，跨窗口协作见 `handoff/HANDOFF.md`。
 
 ## 当前状态（2026-11-17）
 
 - [x] 本地分离管线：`.venv`（Python 3.12 + demucs 4.1.0 + torch 2.15），模型已缓存离线可用
 - [x] 测试曲已完成四轨与六轨分离（`separated/htdemucs/`、`separated/htdemucs_6s/`）
-- [ ] **前端从零开始——这是队友的战场**
+- [x] 原生 JS 六轨播放器原型（`web/`，commit 7e35c05）——**同步引擎设计已验证，是迁移的参考实现**
+- [ ] **队友任务：迁移到 React + TS + shadcn/ui，并继续动效层**
 
-## 前端任务与验收（MVP 顺序）
+## 队友任务：React + shadcn 迁移（按此动工）
 
-1. **Vite + React + TS 起项目**，shadcn/ui 接入
-2. **多轨同步播放引擎**（最核心、最难）：
-   - 四轨 wav 各自 `AudioBufferSourceNode`，同一 AudioContext
-   - 验收 A：播放中拖动进度条 seek，四轨不错位
-   - 验收 B：连续播放 1 分钟无漂移（M1 上用 `audioContext.currentTime` 对齐）
-   - 验收 C：暂停/恢复后仍同步
-3. **每轨 UI**：彩色波形、音量滑条、Mute/Solo
-4. **预设模式**：卡拉OK（人声 Mute）、纯伴奏、鼓点提取
-5. **后续**：AnalyserNode 律动背景、歌曲切换
-
-前端先加载 `separated/htdemucs/test_song/` 下的四轨开发（本地文件名可硬编码），版权合规放到部署阶段再换正式曲目。
+1. **起项目**：Vite `react-ts` 模板，装 `tailwindcss @tailwindcss/vite`；shadcn 官方 Vite 接入流程（别名 `@/*`、tailwind 插件、`index.css` 只留 `@import "tailwindcss"`）
+   - 实测注意：新版 shadcn CLI 参数是 `-b base/radix/aria`（组件库）和 `-p`（preset），旧教程里的 `--base-color` 已不存在
+   - 本机 npm 直连官方 registry 可用（node v24 / npm 11）；Python 侧 pip 才需要镜像
+2. **同步引擎必须原样移植原型 `web/app.js` 的设计**（这是全项目最难的部分，已验证可用）：
+   - 单一 `AudioContext` + 每轨一个 `GainNode` 汇到 master
+   - 播放/seek：**所有源用同一个 `when` 调 `src.start(when, offset)`**，样本级对齐；seek 时先停掉全部源再重建，不做"追时间"修正
+   - 位置计算：`ctx.currentTime - startedAt + startOffset`，暂停时记录 `pausedAt`
+   - 拖动 scrub：按下即暂停，松手恢复播放
+   - Mute/Solo：`effectiveGain = soloActive && !solo ? 0 : (muted ? 0 : vol)`，用 `setTargetAtTime` 平滑
+3. **验收（不变）**：seek 后六轨不错位；连续播放 1 分钟无漂移；暂停/恢复同步；控制台 0 报错
+4. 波形：`scripts/make_peaks.py` 生成 `peaks.json`（自动识别轨道数），前端画双 canvas（暗层全量 + 亮层按进度裁剪）
+5. 开发时音频在 `../separated/htdemucs_6s/test_song`（项目外）——Vite 需要 `server.fs.allow: ['..']` 或把资产拷进 `public/`；**部署前必须换成 CC 协议曲目并压缩**（现六轨约 290MB、解码后内存约 570MB）
 
 ## 本地命令备忘
 
