@@ -18,8 +18,9 @@
 
 ```
 music-src/          分离源音频（本地资产，不入线上版）
-separated/          Demucs 分离输出（四轨 wav）
+separated/          Demucs 分离输出（四轨/六轨 wav）
 需求文档.md          项目需求、赛制约束与功能范围
+AGENTS.md           开发交接文档（技术栈、验收标准、禁止事项）——前端开发先读这个
 ```
 
 ## 本地跑分离
