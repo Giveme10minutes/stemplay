@@ -1,0 +1,266 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+/* 第 2 轮：注册关键 token 为可插值类型，使主题/背景切换能在 CSS 层做
+   350-500ms 缓出过渡；连续切换天然从当前计算值续接、可中断、不排队。 */
+@property --sp-accent { syntax: "<color>"; inherits: true; initial-value: #8b93f8; }
+@property --sp-bg-base { syntax: "<color>"; inherits: true; initial-value: #0b1020; }
+@property --sp-grad-1 { syntax: "<color>"; inherits: true; initial-value: #1c2452; }
+@property --sp-grad-2 { syntax: "<color>"; inherits: true; initial-value: #0b1020; }
+@property --sp-grad-3 { syntax: "<color>"; inherits: true; initial-value: #2a1b4d; }
+@property --sp-grad-4 { syntax: "<color>"; inherits: true; initial-value: #2a1b4d; }
+@property --sp-solid { syntax: "<color>"; inherits: true; initial-value: #101830; }
+@property --sp-bg-angle { syntax: "<angle>"; inherits: true; initial-value: 160deg; }
+@property --sp-scrim-color { syntax: "<color>"; inherits: true; initial-value: #05080f; }
+@property --sp-scrim-alpha { syntax: "<number>"; inherits: true; initial-value: 0.2; }
+@property --sp-brighten-alpha { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --sp-bg-brightness { syntax: "<number>"; inherits: true; initial-value: 1; }
+@property --sp-fx { syntax: "<number>"; inherits: true; initial-value: 0.6; }
+@property --glass-bg { syntax: "<color>"; inherits: true; initial-value: oklch(1 0 0 / 5%); }
+@property --glass-border { syntax: "<color>"; inherits: true; initial-value: oklch(1 0 0 / 12%); }
+@property --glass-highlight { syntax: "<color>"; inherits: true; initial-value: oklch(1 0 0 / 9%); }
+@property --glass-blur { syntax: "<length>"; inherits: true; initial-value: 20px; }
+@property --playhead-glow { syntax: "<color>"; inherits: true; initial-value: oklch(1 0 0 / 55%); }
+@property --playhead-core { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --background { syntax: "<color>"; inherits: true; initial-value: #0b1020; }
+@property --foreground { syntax: "<color>"; inherits: true; initial-value: oklch(0.97 0.005 250); }
+@property --card { syntax: "<color>"; inherits: true; initial-value: oklch(0.21 0.02 255); }
+@property --card-foreground { syntax: "<color>"; inherits: true; initial-value: oklch(0.97 0.005 250); }
+@property --popover { syntax: "<color>"; inherits: true; initial-value: oklch(0.23 0.02 255); }
+@property --popover-foreground { syntax: "<color>"; inherits: true; initial-value: oklch(0.97 0.005 250); }
+@property --primary { syntax: "<color>"; inherits: true; initial-value: oklch(0.93 0.02 250); }
+@property --primary-foreground { syntax: "<color>"; inherits: true; initial-value: oklch(0.18 0.03 255); }
+@property --secondary { syntax: "<color>"; inherits: true; initial-value: oklch(0.28 0.02 255); }
+@property --secondary-foreground { syntax: "<color>"; inherits: true; initial-value: oklch(0.97 0.005 250); }
+@property --muted { syntax: "<color>"; inherits: true; initial-value: oklch(0.28 0.02 255); }
+@property --muted-foreground { syntax: "<color>"; inherits: true; initial-value: oklch(0.72 0.015 250); }
+@property --accent { syntax: "<color>"; inherits: true; initial-value: oklch(0.32 0.03 255); }
+@property --accent-foreground { syntax: "<color>"; inherits: true; initial-value: oklch(0.97 0.005 250); }
+@property --border { syntax: "<color>"; inherits: true; initial-value: oklch(1 0 0 / 12%); }
+@property --input { syntax: "<color>"; inherits: true; initial-value: oklch(1 0 0 / 15%); }
+@property --ring { syntax: "<color>"; inherits: true; initial-value: oklch(0.75 0.06 250); }
+
+@theme inline {
+    --font-heading: var(--font-sans);
+    --font-sans: 'Geist Variable', sans-serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+    --background: #0B1020;
+    --foreground: oklch(0.97 0.005 250);
+    --card: oklch(0.21 0.02 255);
+    --card-foreground: oklch(0.97 0.005 250);
+    --popover: oklch(0.23 0.02 255);
+    --popover-foreground: oklch(0.97 0.005 250);
+    --primary: oklch(0.93 0.02 250);
+    --primary-foreground: oklch(0.18 0.03 255);
+    --secondary: oklch(0.28 0.02 255);
+    --secondary-foreground: oklch(0.97 0.005 250);
+    --muted: oklch(0.28 0.02 255);
+    --muted-foreground: oklch(0.72 0.015 250);
+    --accent: oklch(0.32 0.03 255);
+    --accent-foreground: oklch(0.97 0.005 250);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 12%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.75 0.06 250);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.21 0.02 255);
+    --sidebar-foreground: oklch(0.97 0.005 250);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.28 0.02 255);
+    --sidebar-accent-foreground: oklch(0.97 0.005 250);
+    --sidebar-border: oklch(1 0 0 / 12%);
+    --sidebar-ring: oklch(0.75 0.06 250);
+
+    --glass-bg: oklch(1 0 0 / 5%);
+    --glass-border: oklch(1 0 0 / 12%);
+    --glass-highlight: oklch(1 0 0 / 9%);
+    --playhead-core: #ffffff;
+    --playhead-glow: oklch(1 0 0 / 55%);
+
+    --track-vocals: #f59e0b;
+    --track-drums: #ef4444;
+    --track-bass: #8b5cf6;
+    --track-guitar: #ec4899;
+    --track-piano: #06b6d4;
+    --track-other: #10b981;
+    --track-fallback: #94a3b8;
+
+    --identity-w: 232px;
+    --row-h: 72px;
+    --ruler-h: 32px;
+
+    /* 主题/背景 400ms 缓出；材质滑杆 200ms，拖动跟手 */
+    transition:
+        --sp-accent 400ms ease-out, --sp-bg-base 400ms ease-out,
+        --sp-grad-1 400ms ease-out, --sp-grad-2 400ms ease-out,
+        --sp-grad-3 400ms ease-out, --sp-grad-4 400ms ease-out,
+        --sp-solid 400ms ease-out, --sp-bg-angle 400ms ease-out,
+        --sp-scrim-color 400ms ease-out, --sp-scrim-alpha 400ms ease-out,
+        --sp-brighten-alpha 400ms ease-out,
+        --background 400ms ease-out, --foreground 400ms ease-out,
+        --card 400ms ease-out, --card-foreground 400ms ease-out,
+        --popover 400ms ease-out, --popover-foreground 400ms ease-out,
+        --primary 400ms ease-out, --primary-foreground 400ms ease-out,
+        --secondary 400ms ease-out, --secondary-foreground 400ms ease-out,
+        --muted 400ms ease-out, --muted-foreground 400ms ease-out,
+        --accent 400ms ease-out, --accent-foreground 400ms ease-out,
+        --border 400ms ease-out, --input 400ms ease-out, --ring 400ms ease-out,
+        --playhead-glow 400ms ease-out, --playhead-core 400ms ease-out,
+        --glass-bg 200ms ease-out, --glass-border 200ms ease-out,
+        --glass-highlight 200ms ease-out, --glass-blur 200ms ease-out,
+        --sp-bg-brightness 200ms ease-out, --sp-fx 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        transition: none;
+    }
+}
+
+@media (max-width: 767px) {
+    :root {
+        --identity-w: 88px;
+        --row-h: 64px;
+        --ruler-h: 28px;
+    }
+}
+
+.dark {
+    --background: #0B1020;
+    --foreground: oklch(0.97 0.005 250);
+    --card: oklch(0.21 0.02 255);
+    --card-foreground: oklch(0.97 0.005 250);
+    --popover: oklch(0.23 0.02 255);
+    --popover-foreground: oklch(0.97 0.005 250);
+    --primary: oklch(0.93 0.02 250);
+    --primary-foreground: oklch(0.18 0.03 255);
+    --secondary: oklch(0.28 0.02 255);
+    --secondary-foreground: oklch(0.97 0.005 250);
+    --muted: oklch(0.28 0.02 255);
+    --muted-foreground: oklch(0.72 0.015 250);
+    --accent: oklch(0.32 0.03 255);
+    --accent-foreground: oklch(0.97 0.005 250);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 12%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.75 0.06 250);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    /* 氛围背景由 BackgroundLayer 统一承担（主题渐变/纯色/图片+遮罩） */
+    }
+  html {
+    @apply font-sans;
+    font-family: 'Geist Variable', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+    }
+}
+
+@layer components {
+  .glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur, 20px));
+    -webkit-backdrop-filter: blur(var(--glass-blur, 20px));
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), var(--glass-shadow, 0 12px 40px oklch(0 0 0 / 35%));
+  }
+  /* 舞台内部的小浮层用实底面板：避免六轨区域嵌套多层 blur */
+  .panel-solid {
+    background: var(--popover);
+    color: var(--popover-foreground);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), var(--glass-shadow, 0 12px 40px oklch(0 0 0 / 35%));
+  }
+  .sp-bg-img {
+    animation: sp-bg-fade 450ms ease-out;
+  }
+  .playhead-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    margin-left: -1px;
+    pointer-events: none;
+    background: var(--playhead-core);
+    box-shadow: 0 0 6px 1px var(--playhead-glow), 0 0 18px 4px color-mix(in srgb, var(--sp-accent) 25%, transparent);
+    z-index: 10;
+  }
+}
+
+@keyframes sp-bg-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-bg-img {
+    animation: none;
+  }
+}
