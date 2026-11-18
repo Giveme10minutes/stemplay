@@ -1,12 +1,18 @@
 # StemPlay
 
-把一首歌拆成人声、鼓、贝斯、其他四个轨道，在浏览器里亲手混音的交互式体验。
+把一首歌拆成人声、鼓、贝斯、吉他、钢琴和其他声部，在浏览器里同步播放与混音。
 
 - 分离引擎：[Demucs (HTDemucs)](https://github.com/facebookresearch/demucs)（MIT 协议，Meta AI）
 - 前端：React + TypeScript + shadcn/ui + Web Audio API
 - 用途：2026 Qoder 高校创造力大赛 · LifeHack 赛道参赛作品
 
-## 当前进度（MVP）
+## Windows 本地启动
+
+安装 Node.js 24 后，双击仓库根目录的 [`start.cmd`](start.cmd)。脚本会在缺少依赖时安装前端依赖，启动本地开发服务并打开浏览器。按 `Ctrl+C` 停止。
+
+有已处理的分轨 WAV 时，按 [资源管线说明](pipeline/README.md) 生成 `build/test_song/`，即可加载默认试听。也可以从播放器的「导入」入口选择现有的资源包发布目录。新版播放器及验收说明见 [`app/README.md`](app/README.md)。
+
+## 早期 MVP 计划
 
 - [x] 本地 Demucs 分离链路跑通（M1 Pro MPS，4 分半歌曲约 44 秒完成分离）
 - [ ] 四轨同步播放网页（seek 不漂移验收）
