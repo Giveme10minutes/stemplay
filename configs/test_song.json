@@ -1,0 +1,15 @@
+{
+  "id": "test_song",
+  "title": "测试曲（版权素材，仅本地评估）",
+  "sourceAudio": "../music-src/test_song.flac",
+  "license": {
+    "status": "unverified",
+    "spdx": null,
+    "source": "bilibili 版权内容，仅供本地分离质量评估，禁止进入公开部署包"
+  },
+  "model": {
+    "name": "htdemucs_6s",
+    "family": "demucs",
+    "version": "4.1.0"
+  }
+}
