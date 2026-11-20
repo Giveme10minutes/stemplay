@@ -7,7 +7,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, type Plugin } from "vite";
 
 const configDir = path.dirname(fileURLToPath(import.meta.url));
-const resourceRoot = path.resolve(configDir, "../build/test_song");
+const resourceRoot = path.resolve(configDir, process.env.STEMPLAY_RESOURCES ?? "../build/test_song");
 
 const MIME: Record<string, string> = {
   ".json": "application/json; charset=utf-8",
