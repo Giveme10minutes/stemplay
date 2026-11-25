@@ -19,10 +19,6 @@ if not exist "node_modules\.bin\vite.cmd" (
     if errorlevel 1 goto :failed
 )
 
-if not exist "..\build\test_song\current.json" (
-    echo [StemPlay] No default demo yet. Use Import in the app, or see pipeline\README.md.
-)
-
 echo [StemPlay] Starting the local player. Press Ctrl+C to stop.
 call npm.cmd run dev -- --host 127.0.0.1 --open
 if errorlevel 1 goto :failed

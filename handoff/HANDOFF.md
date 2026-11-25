@@ -2,7 +2,7 @@
 
 > 多窗口协作用：新会话/新窗口开工前先读这份文件。改动后请更新对应小节并注明日期。
 
-最后更新：2026-11-18
+最后更新：2026-11-25
 
 ## 项目一句话
 
@@ -83,6 +83,16 @@ StemPlay——音乐多轨分离演示平台，参加 2026 Qoder 高校创造力
   - 主会话独立复核：tsc 0；round4 headless 复跑 23/23（冲击 4 次@8.46/9.84/11.10/14.18 与离线特征模拟一致、同轨最小间隔 1.378s；双轨同帧强制→触发+2/主+1；聚光偏差 0 vs 解析指数 tau=0.2、非聚焦轨 gv 0.22 可见、行 0px；控件 bbox 0px；场景 testOverride 单元驱动——40s 片段自然播放无 ≥2s 的 p90 段，离线模拟证实，maxFlow 1.191≤1.2；安静 0/0/0/0；增强 shake 2.72≤3 且粒子>标准；master 关保留播放线+明暗；重载恢复轻柔；reduced 全空间效果 0；12 次连切 maxGap 129.5ms）；round3 回归 12/12；控制台 0 报错。证据 `app/verification/round4-*`。
   - 诚实限制：持续高能场景在本 40s 片段不自然触发（用暴露钩子单元验证）；合并以强制同帧证明；headless 帧时（p95 22-44ms，软件渲染）不代替真机 60fps 实测（第 6 轮）。
   - 策划书第 3/4 轮到此收口；第 5 轮导入与曲库、第 6 轮整体打磨待用户指示。
+- **静态曲库与多曲切换完成（2026-11-25，app/，线上不再依赖后端）**：
+  - 固定投放目录 `app/public/resources/tracks/<曲目id>/`（每目录一份 pipeline 发布包，manifest.json 必须在目录根）；
+    歌单 `catalog.json` 由 `vite.config.ts` 生成（dev 请求时现扫、`vite build` 开始写入 public 并进 dist，已 gitignore）。
+  - 加载器改为读 catalog → 按 `trackPath` 钉住曲目；顶栏新增「曲目」切歌菜单（`TrackPicker`），上次曲目记 localStorage；
+    目录缺文件标 `incomplete` 并禁用；空曲库给出放置路径提示 + 重试（放回目录后点重试即可，无需刷新）。
+  - `STEMPLAY_RESOURCES=<构建目录>` 仍可用于本地评估未授权曲目（单首，catalog 按 current.json 现合成）；导入面板不变。
+  - 验证（headless Chrome）：dev 9/9、生产 `vite preview` 6/6、导入回归 4/4、空曲库+重试 3/3、覆盖模式（发如雪 300s 可播）
+    全部通过，控制台 0 错误；移动端菜单不越界。`tsc -b` 通过、lint 0 error（5 个既有 warning）。
+  - 注意：`public/resources/tracks/` 会随部署与公开仓库公开，只能放授权允许公开的曲目；旧验证脚本
+    （`verification/round5-verify.mjs`）里的 "URL 源=build/test_song" 前置已过时，复跑需先往 tracks/ 放一首或设覆盖变量。
 
 ## 下一步（按优先级）
 

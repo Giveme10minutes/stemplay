@@ -12,7 +12,16 @@ import { fxStore, type FxStore } from "@/lib/fx";
 import { buildImpacts, stepImpacts, type ImpactModel } from "@/lib/impacts";
 import { libraryStore, setPackLoader } from "@/lib/library";
 import { motionStore, tierDef } from "@/lib/motion";
-import { loadResources, type LoadedResources, type LoadSpec, type Preset } from "@/lib/resources";
+import {
+  loadCatalog,
+  loadResources,
+  ResourceError,
+  type Catalog,
+  type CatalogTrack,
+  type LoadedResources,
+  type LoadSpec,
+  type Preset,
+} from "@/lib/resources";
 import { themeStore } from "@/lib/theme";
 import { clamp, computeView, fmt, type DrawFn, type ViewMode, type ViewRange, type ViewState } from "@/lib/view";
 
@@ -37,9 +46,15 @@ type LoadState =
 
 const EMPTY_MIX: MixState = { vol: {}, muted: {}, solo: {} };
 
+const TRACK_KEY = "stemplay.track.v1";
+const EMPTY_CATALOG_MESSAGE =
+  "曲库为空：请把 pipeline 发布包放入 app/public/resources/tracks/<曲目>/ 后刷新";
+
 export default function App() {
   const [load, setLoad] = useState<LoadState>({ status: "loading", decoded: 0, total: 6 });
   const [data, setData] = useState<LoadedResources | null>(null);
+  const [catalog, setCatalog] = useState<Catalog | null>(null);
+  const [trackId, setTrackId] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [mix, setMix] = useState<MixState>(EMPTY_MIX);
   const [viewMode, setViewMode] = useState<ViewMode>("follow");
@@ -56,7 +71,7 @@ export default function App() {
   const impactRef = useRef<ImpactModel | null>(null);
   const genRef = useRef(0);
   const loadedRef = useRef<LoadedResources | null>(null);
-  const lastSpecRef = useRef<LoadSpec>({ kind: "url" });
+  const lastSpecRef = useRef<LoadSpec | null>(null);
   const lastErrorRef = useRef<string | null>(null);
   const viewRef = useRef<ViewState>({ mode: "follow", windowSec: 16, manual: false, manualStart: 0 });
   const lastViewRef = useRef<ViewRange>({ t0: 0, t1: 40 });
@@ -71,7 +86,8 @@ export default function App() {
   const lastAriaSecRef = useRef(-1);
   const lastPlayingRef = useRef(false);
 
-  const doLoad = useCallback(async (spec: LoadSpec = { kind: "url" }): Promise<boolean> => {
+  // spec=null：按曲库启动（上次听过的歌，否则第一首可用的）；重试时沿用同一语义
+  const doLoad = useCallback(async (spec: LoadSpec | null = null): Promise<boolean> => {
     const gen = ++genRef.current;
     const cancelled = () => genRef.current !== gen;
     lastSpecRef.current = spec;
@@ -85,18 +101,46 @@ export default function App() {
     setLoad({ status: "loading", decoded: 0, total: 6 });
     try {
       const ctx = engine.ensureContext();
+      let target = spec;
+      if (target === null) {
+        const cat = await loadCatalog();
+        if (cancelled()) {
+          engine.dispose();
+          return false;
+        }
+        setCatalog(cat);
+        const ready = cat.tracks.filter((t) => t.status === "ready");
+        let saved: string | null = null;
+        try {
+          saved = localStorage.getItem(TRACK_KEY);
+        } catch {
+          /* 隐私模式等：不记忆曲目 */
+        }
+        const chosen = ready.find((t) => t.id === saved) ?? ready[0];
+        if (!chosen) throw new ResourceError(EMPTY_CATALOG_MESSAGE);
+        target = { kind: "url", trackId: chosen.id, trackPath: chosen.path };
+        lastSpecRef.current = target;
+      }
       const res = await loadResources(
         ctx,
         (decoded, total) => {
           if (!cancelled()) setLoad({ status: "loading", decoded, total });
         },
         cancelled,
-        spec,
+        target,
       );
       if (cancelled()) {
         engine.dispose();
         res.disposeUrls();
         return false;
+      }
+      setTrackId(target.kind === "url" ? target.trackId : null);
+      if (target.kind === "url") {
+        try {
+          localStorage.setItem(TRACK_KEY, target.trackId);
+        } catch {
+          /* 存不进去只影响下次默认曲目 */
+        }
       }
       engine.init(
         res.tracks.map((t) => ({ id: t.id, delaySec: t.delaySec })),
@@ -415,7 +459,16 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [ready, togglePlay]);
 
-  const title = data?.manifest.track.title ?? "StemPlay";
+  const onSelectTrack = useCallback(
+    (t: CatalogTrack) => {
+      void doLoad({ kind: "url", trackId: t.id, trackPath: t.path });
+    },
+    [doLoad],
+  );
+
+  // 切歌加载期间沿用歌单里的歌名，标题不会闪回 "StemPlay"
+  const title =
+    catalog?.tracks.find((t) => t.id === trackId)?.title ?? data?.manifest.track.title ?? "StemPlay";
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -425,6 +478,10 @@ export default function App() {
         artist={data?.artist ?? null}
         album={data?.album ?? null}
         artwork={data?.artwork ?? null}
+        catalog={catalog}
+        trackId={trackId}
+        switching={load.status === "loading"}
+        onSelectTrack={onSelectTrack}
         onOpenAppearance={() => setAppearanceOpen(true)}
       />
       <main className="mx-auto w-full max-w-[1440px] flex-1 px-3 py-2 pb-40 md:px-6 md:pb-32">

@@ -5,9 +5,9 @@
 本轮交付资源适配、播放状态机、真实多轨时间轴、统一时钟、拖动、Mute/Solo/音量、跟随/全览、手机布局。
 主题/动效/导入（第 2–6 轮）不在本轮范围，仅留接缝（CSS 变量、单一渲染循环、引擎与 UI 分离、顶栏 inert 按钮）。
 
-> 版权红线：`build/test_song/` 与 `separated/` 为版权测试曲，**仅本地**。本目录源码与 `public/` 不含任何音频；
-> 开发期音频由 Vite dev-server 中间件在请求时从 `build/test_song/` 读取，绝不拷贝进可部署路径。
-> 部署前必须换 CC 协议曲目（见 `pipeline/README.md` 白名单）。
+> 版权红线：`build/test_song/` 与 `separated/` 为版权测试曲，**仅本地**，不进 `public/`。
+> `public/resources/tracks/` 只放授权允许公开的曲目（线上与 GitHub 仓库均公开）；本地评估未授权曲目用
+> `STEMPLAY_RESOURCES=<构建目录>` 或导入面板，不落可部署路径。
 
 ## 运行
 
@@ -17,19 +17,25 @@ npm install        # 本机 npm 直连官方 registry 可用（node v24 / npm 11
 npm run dev        # http://localhost:5173
 ```
 
-前置：仓库根目录已构建本地资源（`build/test_song/current.json` 存在）。若未构建，
-`/resources/current.json` 返回 503，UI 显示"本地资源未构建"。重建命令见 `pipeline/README.md`：
+前置：`public/resources/tracks/<曲目>/` 下放一首 pipeline 发布包（`manifest.json` 在目录根上，别多套一层）；
+没有曲目时页面显示"曲库为空：请把 pipeline 发布包放入 app/public/resources/tracks/<曲目>/ 后刷新"。
+生产命令见 `pipeline/README.md`：
 
 ```bash
 PY=.venv/Scripts/python.exe
-$PY -m pipeline build --stems separated/htdemucs_6s/test_song --out build/test_song --config configs/test_song.json
+$PY -m pipeline build --stems separated/htdemucs_6s/<曲目> --out build/<曲目> --config configs/<曲目>.json
+cp -R build/<曲目>/releases/<release-id>/. public/resources/tracks/<曲目>/
+rm -rf public/resources/tracks/<曲目>/{features,report.json}   # 播放器不读，可选删
 ```
 
-资源中间件（`vite.config.ts` 内 `stemplay-local-resources` 插件）：
-- `GET /resources/*` 映射到 `<repo>/build/test_song/*`（相对配置文件解析仓库根）。
-- 路径越界（含编码 `%2f` 穿越）→ 403；`current.json` 每次请求现读，重建后刷新即生效。
-- MIME：`.json→application/json`、`.m4a→audio/mp4`、`.wav→audio/wav`；支持 Range（206）与全量 200 + `Accept-Ranges`。
-- 仅 dev-server 生效；生产构建不含该中间件，也不含音频。
+静态曲库（线上不需要后端）：
+- `catalog.json` 由 `vite.config.ts` 生成并已 gitignore：dev 请求 `/resources/catalog.json` 时现扫
+  `public/resources/tracks/`（放新目录刷新即出现，按目录名排序）；`vite build` 开始时写入 public 并随构建进 `dist/`。
+- 曲目目录缺 `manifest.json` / `preview/*` 时 catalog 标 `incomplete`，切歌菜单禁用并提示缺什么。
+- 顶栏「曲目」菜单切歌，上次曲目记在 `localStorage stemplay.track.v1`；切歌/封面/特效均走原有 `doLoad` 通道。
+- 本地评估未授权曲目：`STEMPLAY_RESOURCES=../build/faruxue npm run dev`（单首，catalog 按 `current.json` 现合成），
+  或「导入」资源包（仅存本机 IndexedDB）。
+- 中间件仅在 `STEMPLAY_RESOURCES` 模式生效（越界 403、MIME、Range 206）；默认模式由 Vite 直接托管 public。
 
 其他命令：`npm run build`（tsc -b + vite build）、`npm run preview`、`npm run lint`（oxlint）。
 
@@ -37,12 +43,13 @@ $PY -m pipeline build --stems separated/htdemucs_6s/test_song --out build/test_s
 
 | 文件 | 职责 |
 |---|---|
-| `vite.config.ts` | 资源中间件（映射/越界防护/MIME/Range/503）、`@` 别名、tailwind 插件 |
-| `src/lib/resources.ts` | 会话固定 release 适配：读 `current.json` 一次→pin `releaseBase`；相对路径以所属 JSON 的 URL 为基准；preview-first 加载 manifest/presets/preview/preview-beats/逐轨切片特征；逐轨 `decodeAudioData` + 进度(n/6) + 取消代次；轨道 id/标签/身份色动态映射（不写死轨表） |
+| `vite.config.ts` | 静态曲库：`/resources/catalog.json` 现扫生成（dev）+ 构建时写入 public；`STEMPLAY_RESOURCES` 覆盖模式的只读文件中间件（越界 403/MIME/Range）；`@` 别名、tailwind 插件 |
+| `src/lib/resources.ts` | 曲库适配：读 `catalog.json` → 按 `trackPath` 钉住曲目目录；相对路径以所属 JSON 的 URL 为基准；preview-first 加载 manifest/presets/preview/preview-beats/逐轨切片特征；逐轨 `decodeAudioData` + 进度(n/6) + 取消代次；轨道 id/标签/身份色动态映射（不写死轨表） |
 | `src/lib/view.ts` | 跟随(16s 窗/42% 锚点/首尾 clamp)/全览视图数学、`fmt`/`clamp`、`DrawFn` 类型 |
 | `src/audio/engine.ts` | `StemEngine`：单 AudioContext + 每轨 GainNode→master；**所有源同一 `when` 起播**（样本级对齐）；`position()=currentTime−startedAt+startOffset`；seek 停旧源统一重建；scrub 暂停/松手恢复；`effectiveGain`(mute/solo 优先)×preset×vol，`setTargetAtTime` 平滑；master 音量；无 React state |
 | `src/App.tsx` | 离散 React state（playing/view/preset/mix/load）+ **单一 rAF 循环**经 refs 画 canvas/更新时间/进度/播放线；键盘(Space/←→/Shift/Home/End)；加载/重试；dev 暴露 `window.__stemplay` |
-| `src/components/TopBar.tsx` | 封面占位、歌名(manifest)、"六轨拆解舞台 · 预览"、inert 外观/动效/导入（title=即将开放） |
+| `src/components/TopBar.tsx` | 封面、歌名(manifest)、切歌菜单入口、外观/动效/导入 |
+| `src/components/TrackPicker.tsx` | 顶栏「曲目」浮层：列 catalog 曲目、当前项对勾、`incomplete` 目录禁用并注明缺失文件；移动端贴屏边定位 |
 | `src/components/Stage.tsx` | 玻璃主面板；头部(预览标签/BPM/跟随·全览/回到播放位置)；左身份列+右波形区+贯穿播放线 overlay；滚轮平移 |
 | `src/components/TrackRow.tsx` | 身份色点/标签/延迟待核验徽章；M/S Toggle；桌面音量 Slider / 移动点按展开 |
 | `src/components/Waveform.tsx` | 逐像素列 min(peakMin)/max(peakMax) 聚合（缩小不漏瞬态）；dim(α0.35)+bright(α1) 双 offscreen 缓存（仅尺寸/缩放/数据变化重绘）；rAF 合成+已播裁剪；pointer scrub |

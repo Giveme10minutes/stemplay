@@ -118,8 +118,29 @@ export interface LoadedResources {
   disposeUrls: () => void;
 }
 
+export interface CatalogTrack {
+  id: string;
+  title: string;
+  artist: string | null;
+  /** 相对 /resources/ 的目录路径，以 / 结尾 */
+  path: string;
+  /** incomplete：目录里缺文件（见 missing），加载器与切歌菜单都跳过 */
+  status: "ready" | "incomplete";
+  missing: string[];
+}
+
+export interface Catalog {
+  schemaVersion: number;
+  tracks: CatalogTrack[];
+}
+
+/** 线上/本地共用的静态曲库根；由 vite.config.ts 生成，线上不需要后端 */
+export const CATALOG_PATH = "/resources/catalog.json";
+
 export interface UrlLoadSpec {
   kind: "url";
+  trackId: string;
+  trackPath: string;
 }
 
 export interface PackLoadSpec {
@@ -208,11 +229,13 @@ export function resolvePosix(baseDir: string, rel: string): string {
   return parts.join("/");
 }
 
-async function createUrlIO(): Promise<SourceIO> {
-  const currentUrl = new URL("/resources/current.json", window.location.href);
-  const current = await fetchJson<{ release: string }>(currentUrl);
-  const releasePath = current.release.endsWith("/") ? current.release : `${current.release}/`;
-  const releaseBase = new URL(releasePath, currentUrl);
+export function loadCatalog(): Promise<Catalog> {
+  return fetchJson(new URL(CATALOG_PATH, window.location.href));
+}
+
+async function createUrlIO(spec: UrlLoadSpec): Promise<SourceIO> {
+  const catalogUrl = new URL(CATALOG_PATH, window.location.href);
+  const releaseBase = new URL(spec.trackPath, catalogUrl);
   const manifestUrl = new URL("manifest.json", releaseBase);
   return {
     kind: "url",
@@ -305,9 +328,9 @@ export async function loadResources(
   ctx: AudioContext,
   onProgress: (decoded: number, total: number) => void,
   isCancelled: () => boolean,
-  spec: LoadSpec = { kind: "url" },
+  spec: LoadSpec,
 ): Promise<LoadedResources> {
-  const io = spec.kind === "pack" ? await createPackIO(spec) : await createUrlIO();
+  const io = spec.kind === "pack" ? await createPackIO(spec) : await createUrlIO(spec);
 
   const manifest = await io.readJson<Manifest>(io.manifestRef);
 

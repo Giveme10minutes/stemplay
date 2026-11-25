@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "kind": "report",
+  "pipelineVersion": "0.7.0",
+  "trackId": "faruxue",
+  "generatedAt": "2026-11-20T13:34:03+00:00",
+  "checks": [
+    {
+      "id": "license",
+      "status": "restricted",
+      "detail": "status=unverified spdx=None publicDeployAllowed=False"
+    },
+    {
+      "id": "features-mounts",
+      "status": "pass",
+      "detail": "6 轨特征 ready"
+    },
+    {
+      "id": "beats-mount",
+      "status": "pass",
+      "detail": "status=ready"
+    },
+    {
+      "id": "presets-mount",
+      "status": "pass",
+      "detail": "status=ready"
+    },
+    {
+      "id": "preview-mount",
+      "status": "pass",
+      "detail": "status=ready"
+    },
+    {
+      "id": "source-audio-paths",
+      "status": "pass",
+      "detail": "6 轨源音频路径均可解析"
+    },
+    {
+      "id": "preview-decode",
+      "status": "pass",
+      "detail": "6 轨解码回检通过（延迟/时长/互相关）"
+    },
+    {
+      "id": "preview-delay-consistency",
+      "status": "pass",
+      "detail": "逐轨编码延迟极差 0 样本（前端按各轨 delaySec 补偿）"
+    },
+    {
+      "id": "preview-grid-snap",
+      "status": "pass",
+      "detail": "originSec×frameRate 偏离整数 0.00e+00"
+    },
+    {
+      "id": "preview-features",
+      "status": "pass",
+      "detail": "切片特征完整（K=14982，时间基准一致）"
+    },
+    {
+      "id": "preview-beats-range",
+      "status": "pass",
+      "detail": "564 个局部拍点，越界 0"
+    },
+    {
+      "id": "full-features",
+      "status": "pass",
+      "detail": "整曲特征完整且绑定当前源"
+    },
+    {
+      "id": "preset-peaks",
+      "status": "pass",
+      "detail": "逐声道实测 full=0.9500; vocal=0.9353; rhythm=0.9373"
+    },
+    {
+      "id": "beats-state",
+      "status": "degraded",
+      "detail": "bpm=115.78 score=0.5085 snapEnabled=False reason=score-below-threshold"
+    },
+    {
+      "id": "size-target",
+      "status": "warn",
+      "detail": "预览音频 28.03MB / 目标 10MB (未达标，可降码率)；资源包合计 41.00MB"
+    }
+  ],
+  "summary": {
+    "pass": 12,
+    "warn": 1,
+    "degraded": 1,
+    "fail": 0,
+    "restricted": 1
+  },
+  "blocking": [],
+  "publishable": true,
+  "sizes": {
+    "previewAudioBytes": 29390079,
+    "packageBytes": 42986709
+  },
+  "previewAudioTargetBytes": 10485760,
+  "license": {
+    "status": "unverified",
+    "spdx": null,
+    "source": "bilibili 版权内容，仅供本地分离质量评估，禁止进入公开部署包",
+    "publicDeployAllowed": false
+  },
+  "whitelist": [],
+  "whitelistNote": "授权未确认 → 白名单为空，资源包仅限本地；公开部署另需人工确认分离音质（自动质检不判断音质）",
+  "backendVerified": [
+    "预览 AAC 逐轨解码回检：能量包络粗定位 + 波形细化实测起点延迟（delayStatus=measured/uncertain/silent；uncertain → delaySec=null 不写补偿值、非阻断待核验）、内容时长、对齐相关系数",
+    "六轨预览同一裁剪窗口；特征为整曲数组 hop 网格精确切片；拍点已平移",
+    "全部特征数组有限值、等长、无 NaN/Infinity（allow_nan=False 落盘）；立体声逐声道能量合并，反相不抵消",
+    "三套预设按导出增益流式重读源 WAV 逐声道实测峰值 ≤ headroomTarget（统一缩放保持声部比例），并校验 busPeak 字段与实测一致（防篡改/失真）",
+    "manifest 挂载与产物 sha256 一致；缓存命中前已验完整性；源音频路径逐一复核存在"
+  ],
+  "browserPending": [
+    "decodeAudioData 对 m4a 编码延迟（gapless 元数据）的处理是否与 ffmpeg 回检一致 → 用 delaySec 补偿后实测对齐；delaySec=null（delayStatus=uncertain）表示延迟不确定，前端不做补偿并视为待核验",
+    "六轨 BufferSource 同一 when 启动的样本级同步（沿用现有引擎，预览需按 delaySec 逐轨补偿或统一裁掉 priming）",
+    "setTargetAtTime 预设过渡听感、移动端解码内存与首屏耗时",
+    "特征驱动动画的主观效果（阈值/缩放参数可在 analysisConfig 覆盖后重建）"
+  ]
+}

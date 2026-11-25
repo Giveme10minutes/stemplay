@@ -27,3 +27,6 @@ dist-ssr
 /verification/*.png
 /verification/*.json
 /verification/*.mp3
+
+# 由 vite.config.ts 构建时生成（扫描 public/resources/tracks/）
+/public/resources/catalog.json

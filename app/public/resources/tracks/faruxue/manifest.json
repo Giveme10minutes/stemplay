@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "name": "stemplay-pipeline",
+    "version": "0.7.0",
+    "schemaVersion": 1
+  },
+  "generatedAt": "2026-11-20T13:29:36+00:00",
+  "track": {
+    "id": "faruxue",
+    "title": "发如雪（本地评估）",
+    "originSec": 0.0,
+    "durationSec": 299.630295,
+    "sampleRate": 44100,
+    "channels": 2,
+    "model": {
+      "name": "htdemucs_6s",
+      "family": "demucs",
+      "version": "4.1.0"
+    },
+    "license": {
+      "status": "unverified",
+      "spdx": null,
+      "source": "bilibili 版权内容，仅供本地分离质量评估，禁止进入公开部署包",
+      "publicDeployAllowed": false
+    },
+    "artist": "周杰伦",
+    "album": "十一月的肖邦",
+    "artwork": {
+      "status": "ready",
+      "path": "artwork/cover.png",
+      "mime": "image/png",
+      "width": 512,
+      "height": 512,
+      "sha256": "a2bc9c9273a2712c9ad3c8a5576c342967b9918367d8d1249d01a6fc0fad5914"
+    },
+    "stems": [
+      {
+        "id": "vocals",
+        "audio": {
+          "path": "../../../../separated/htdemucs_6s/faruxue/vocals.wav",
+          "format": "wav-pcm16",
+          "sampleRate": 44100,
+          "channels": 2,
+          "frames": 13213696,
+          "durationSec": 299.630295,
+          "sha256": "aa6ca8f94bf91e2568eb820c83690b88a47c8f25b6a883695a0cd6dd81a7a74b"
+        },
+        "features": {
+          "status": "ready",
+          "path": "features/vocals.json",
+          "frameRate": 50.0,
+          "nFrames": 14982,
+          "sha256": "23844a7625dc8c73ed09c9f9688daf7d103d3a94211867f8ff754e62c4bcd227"
+        }
+      },
+      {
+        "id": "drums",
+        "audio": {
+          "path": "../../../../separated/htdemucs_6s/faruxue/drums.wav",
+          "format": "wav-pcm16",
+          "sampleRate": 44100,
+          "channels": 2,
+          "frames": 13213696,
+          "durationSec": 299.630295,
+          "sha256": "214e54954916a2a17f0e4f2c30424982a9a55bda4f0fa8a8286d4f9a67b96f01"
+        },
+        "features": {
+          "status": "ready",
+          "path": "features/drums.json",
+          "frameRate": 50.0,
+          "nFrames": 14982,
+          "sha256": "8e751cdba8e5f82c2edd6d8488ed0ecc7b7828b181ad0d53319bf8d73737ee37"
+        }
+      },
+      {
+        "id": "bass",
+        "audio": {
+          "path": "../../../../separated/htdemucs_6s/faruxue/bass.wav",
+          "format": "wav-pcm16",
+          "sampleRate": 44100,
+          "channels": 2,
+          "frames": 13213696,
+          "durationSec": 299.630295,
+          "sha256": "b0d8cc3c241e9adfa3e05acb54805c1d338e205e2d6811dbf6b9052252ad0aba"
+        },
+        "features": {
+          "status": "ready",
+          "path": "features/bass.json",
+          "frameRate": 50.0,
+          "nFrames": 14982,
+          "sha256": "b4d6e53b67eefbd56adab7481ba24882d2995f22b18b8e96590bf2cd0865fdae"
+        }
+      },
+      {
+        "id": "guitar",
+        "audio": {
+          "path": "../../../../separated/htdemucs_6s/faruxue/guitar.wav",
+          "format": "wav-pcm16",
+          "sampleRate": 44100,
+          "channels": 2,
+          "frames": 13213696,
+          "durationSec": 299.630295,
+          "sha256": "2ff7e3858bcf04016e82b2a25039f5139269fdf32acba40b7923aedae135856a"
+        },
+        "features": {
+          "status": "ready",
+          "path": "features/guitar.json",
+          "frameRate": 50.0,
+          "nFrames": 14982,
+          "sha256": "29634942ce2d8fc667885ba2839cb19ef469e756660478f99b58143838d6d573"
+        }
+      },
+      {
+        "id": "piano",
+        "audio": {
+          "path": "../../../../separated/htdemucs_6s/faruxue/piano.wav",
+          "format": "wav-pcm16",
+          "sampleRate": 44100,
+          "channels": 2,
+          "frames": 13213696,
+          "durationSec": 299.630295,
+          "sha256": "1378da2b17d86d9a9f5414cde26f29cc6534d8364a729502329246d1bdeb53d8"
+        },
+        "features": {
+          "status": "ready",
+          "path": "features/piano.json",
+          "frameRate": 50.0,
+          "nFrames": 14982,
+          "sha256": "989c0a9a194cfc233d36c9326f229d9302cab230c2cca3ce95ebfd01642af2a9"
+        }
+      },
+      {
+        "id": "other",
+        "audio": {
+          "path": "../../../../separated/htdemucs_6s/faruxue/other.wav",
+          "format": "wav-pcm16",
+          "sampleRate": 44100,
+          "channels": 2,
+          "frames": 13213696,
+          "durationSec": 299.630295,
+          "sha256": "1341c9559c48633a05ceb98db46504e241607c58aa73b1dce4e49b295ab5ab69"
+        },
+        "features": {
+          "status": "ready",
+          "path": "features/other.json",
+          "frameRate": 50.0,
+          "nFrames": 14982,
+          "sha256": "3ddcc8765095b086704e7693da4251e152eadfd214d7f63498cdba8721254444"
+        }
+      }
+    ],
+    "analysis": {
+      "frameRate": 50.0,
+      "hopSamples": 882,
+      "windowSamples": 2048,
+      "windowCenterOffsetSec": 0.0,
+      "bandsHz": {
+        "low": [
+          20.0,
+          250.0
+        ],
+        "mid": [
+          250.0,
+          2000.0
+        ],
+        "high": [
+          2000.0,
+          16000.0
+        ]
+      },
+      "display": {
+        "sharedAcrossStems": true,
+        "rmsRef": 0.22418368463025085,
+        "bandRef": 0.05025832445439577,
+        "onsetRef": 0.3740735222399231,
+        "silenceThreshold": 0.001,
+        "note": "display = clamp(raw / ref, 0, 1)；rms < silenceThreshold 的帧视为静音。ref 为整曲 pooled 分位数，全轨共享，禁止逐轨单独拉满。"
+      }
+    }
+  },
+  "resources": {
+    "beats": {
+      "status": "ready",
+      "path": "beats.json",
+      "sha256": "ce450e75889a623ae6bd3a262f1e098a2fdbe1ddf06ea72e39400330c941a02d",
+      "bpm": 115.78,
+      "snapEnabled": false
+    },
+    "presets": {
+      "status": "ready",
+      "path": "presets.json",
+      "sha256": "853c682e93ec6582822f89b45fb388c2384818bf4ef3770db1181c7473e22733",
+      "presetIds": [
+        "full",
+        "vocal",
+        "rhythm"
+      ]
+    },
+    "preview": {
+      "status": "ready",
+      "path": "preview/preview.json",
+      "sha256": "11b654d8215757c6f97be38cce46e6ccc096019ebd826bae7221695cc7a89930",
+      "originSec": 0.0,
+      "durationSec": 299.6302947845805
+    }
+  }
+}

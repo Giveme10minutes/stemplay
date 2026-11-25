@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Music2 } from "lucide-react";
 import { ImportPanel } from "@/components/ImportPanel";
 import { MotionPanel } from "@/components/MotionPanel";
+import { TrackPicker } from "@/components/TrackPicker";
 import { Button } from "@/components/ui/button";
-import type { ArtworkInfo } from "@/lib/resources";
+import type { ArtworkInfo, Catalog, CatalogTrack } from "@/lib/resources";
 import { useAppearance } from "@/lib/theme";
 
 interface TopBarProps {
@@ -11,10 +12,24 @@ interface TopBarProps {
   artist?: string | null;
   album?: string | null;
   artwork?: ArtworkInfo | null;
+  catalog: Catalog | null;
+  trackId: string | null;
+  switching: boolean;
+  onSelectTrack: (track: CatalogTrack) => void;
   onOpenAppearance: () => void;
 }
 
-export function TopBar({ title, artist, album, artwork, onOpenAppearance }: TopBarProps) {
+export function TopBar({
+  title,
+  artist,
+  album,
+  artwork,
+  catalog,
+  trackId,
+  switching,
+  onSelectTrack,
+  onOpenAppearance,
+}: TopBarProps) {
   const coverUrl = useAppearance().cover.url;
   // 用户提取的封面优先；资源包 artwork 作为缩略图兜底（加载失败如实回退占位图）
   const [artworkFailed, setArtworkFailed] = useState<string | null>(null);
@@ -51,6 +66,7 @@ export function TopBar({ title, artist, album, artwork, onOpenAppearance }: TopB
         </p>
       </div>
       <div className="flex shrink-0 items-center gap-1.5">
+        {catalog && <TrackPicker catalog={catalog} trackId={trackId} switching={switching} onSelect={onSelectTrack} />}
         <Button
           variant="outline"
           size="sm"
